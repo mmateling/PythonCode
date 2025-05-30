@@ -2,6 +2,8 @@
 #
 #  readin_2bcldclass
 #
+#   Author: Marian Mateling (mateling@wisc.edu)
+#
 # ----------------------------------------------------------------------
 
 import numpy as np
@@ -10,6 +12,8 @@ from glob import glob
 from datetime import datetime
 import pyhdf.SD
 import pyhdf.HDF
+
+# Script written and provided by Norm Wood (norman.wood@ssec.wisc.edu)
 import read_var_eos as eos
 
 # ----------------------------------------------------------------------

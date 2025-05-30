@@ -2,6 +2,8 @@
 #
 #  readin_2csnow
 #
+#  Author: Marian Mateling (mateling@wisc.edu)
+#
 # ------------------------------------------------------------------------------
 
 import numpy as np
@@ -10,21 +12,20 @@ from glob import glob
 from datetime import datetime
 import pyhdf.SD
 import pyhdf.HDF
+
+# Script written and provided by Norm Wood (norman.wood@ssec.wisc.edu)
 import read_var_eos as eos
 
 # ------------------------------------------------------------------------------
 
-def readin_file(year, month, day, region):
+def readin_file(year, month, day):
 
 
 	date_str = get_date_str(year, month, day)
 
-    # Directory structure: YYYY/JJJ/YYYYJJJ...*hdf
-	indir = '/ships19/cloud/archive/extern/cloudsat/'+\
-                '2C-SNOW-PROFILE.P1_R05/'+date_str[:4]+'/'+\
-                date_str[4:]+'/'
+	indir = '/data/CLOUDSAT/2c-snow-profile/'
 
-	filelist = glob(indir + date_str + '*.hdf');filelist.sort()
+	filelist = glob(indir + date_str + '*.hdf')
 	
 	snow_list = []; lat_list = []; lon_list = []; time_list = []
 	overpass_name = []; conf_list = []
@@ -46,13 +47,9 @@ def readin_file(year, month, day, region):
 		lons = lon.T[0]		
 
 		# Only append data that falls inside the basin.
-		if region == 'atlantic':
-			# Atlantic: Lat 45 to 82, Lon -76 to 40
-			lat_min = 45; lat_max = 82
-			lon_min = -76; lon_max = 40
-		elif region == 'greatlakes':
-			lat_min = 40; lat_max = 50
-			lon_min = -95; lon_max = -75
+		# Atlantic: Lat 45 to 82, Lon -76 to 40
+		lat_min = 45; lat_max = 82
+		lon_min = -76; lon_max = 40
 
 		inds = np.where(np.logical_and(np.logical_and(lats >= lat_min, \
 		lats < lat_max), np.logical_and(lons >= lon_min, lons < lon_max)))[0]
@@ -63,17 +60,16 @@ def readin_file(year, month, day, region):
 			reshape_conf = np.reshape(conf[inds], len(conf[inds]))
 
 			# Only keep data when confidence flag >= 3			
-			snow_list.append(np.ma.filled(np.ma.masked_where(reshape_conf < 3, \
-				reshape_snow), -9999))
-			conf_list.append(np.ma.filled(np.ma.masked_where(reshape_conf < 3, \
-				reshape_conf), -9999))
+			snow_list.append(np.ma.masked_where(reshape_conf < 3, \
+				reshape_snow))
+			conf_list.append(np.ma.masked_where(reshape_conf < 3, \
+				reshape_conf))
 				
 			lat_list.append(lats[inds])
 			lon_list.append(lons[inds])
 			time_list.append(time[inds])
 
-			# Helps locate files within the 2b-cldclass-lidar reader
-			overpass_name.append(file_.split('/')[9][:13])
+			overpass_name.append(file_.split('/')[4].split('_')[0])
 		
 	return snow_list, lat_list, lon_list, time_list, overpass_name, conf_list
 		
