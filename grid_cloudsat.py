@@ -7,7 +7,7 @@
 import numpy as np
 import sys
 from datetime import datetime, timedelta
-sys.path.insert(1, '/home/mmateling/CS_ERA/readin_scripts')
+
 import readin_2csnow as cloudsat
 import readin_2bcldclass as cldclass
 
